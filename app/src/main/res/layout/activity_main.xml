@@ -67,4 +67,17 @@
         app:layout_constraintStart_toEndOf="@+id/timer_btn"
         app:layout_constraintTop_toBottomOf="@+id/stop_watch_label" />
 
+    <TextView
+        android:id="@+id/clock_time"
+        android:layout_width="102dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="464dp"
+        android:text="Clock Time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.521"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_title"
+        app:layout_constraintVertical_bias="0.992" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

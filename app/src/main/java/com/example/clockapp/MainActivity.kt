@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.clockapp.ui.theme.ClockAppTheme
+import java.time.LocalDate
 
 //In this case extend AppCompatActivity() super class
 //Instead of ComponentActivity()
@@ -33,9 +34,12 @@ class MainActivity : AppCompatActivity() {
         //Inflate layout, set the content view of the activity view
         setContentView(R.layout.activity_main);
 
+
         //Initialize UI Components
-        val timer_btn: Button = findViewById(R.id.timer_btn);
-        val stop_watch_btn: Button = findViewById(R.id.stop_watch_btn);
+        val timer_btn: Button = findViewById(R.id.timer_btn)
+        val stop_watch_btn: Button = findViewById(R.id.stop_watch_btn)
+        val clock_time : TextView = findViewById(R.id.clock_time)
+
 
         //SetUp OnClickListeners
         //Start Activities Explicitly
@@ -50,4 +54,9 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
+
+    fun displayClockTime(){
+        val date = LocalDate.now()
+    }
+
 }
