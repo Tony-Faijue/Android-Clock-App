@@ -51,16 +51,21 @@ class MainActivity : AppCompatActivity() {
 
         //Initialize UI Components
 
-        //Current Time 24-hour format
+        //Current Time 12-hour format
         clockTextView = findViewById(R.id.curr_time)
+        //Run the 24 hour clock
         updateClock()
 
+        //Bottom Navigation Bar OnClick Listeners
         bottomNavBar = findViewById(R.id.bottom_nav_1)
+        //Set the Default Item Selected
+        bottomNavBar.selectedItemId = R.id.nav_clock
+
         //Bottom Navigation Bar onClick listeners
         bottomNavBar.setOnItemSelectedListener {
             item -> when(item.itemId) {
                 //Navigate to Main Activity (Clock)
-                R.id.nav_clock -> { true }
+                R.id.nav_clock -> { true } //Already on MainActivity
                 //Navigate to Timer Activity
                 R.id.nav_timer -> {
                     val intent = Intent(this, TimerActivity::class.java)
@@ -76,20 +81,13 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        //SetUp OnClickListeners
-        //Start Activities Explicitly
-//        timer_btn.setOnClickListener({
-//            val intent = Intent(this, TimerActivity::class.java)
-//            startActivity(intent)
-//        })
-//
-//        stop_watch_btn.setOnClickListener({
-//            val intent = Intent(this, StopWatchActivity::class.java)
-//            startActivity(intent)
-//        })
+
 
     }
 
+    /**
+     * Clean up resources of the activity when destroyed
+     */
     @SuppressLint("ImplicitSamInstance")
     @Override
     override fun onDestroy() {
