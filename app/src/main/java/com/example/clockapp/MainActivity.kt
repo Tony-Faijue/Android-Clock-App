@@ -26,7 +26,14 @@ class MainActivity : AppCompatActivity() {
     // StopWatchActivity - Start a Service: StopWatchService
     // Start, Stop , Reset
 
+    /**
+     * Custom TextView for 24hr clock
+     */
     private lateinit var clockTextView: TextView
+
+    /**
+     * Default TextClock
+     */
     private lateinit var currentLocalTime: TextClock
     private lateinit var bottomNavBar : BottomNavigationView
 
