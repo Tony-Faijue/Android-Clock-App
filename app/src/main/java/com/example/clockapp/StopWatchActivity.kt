@@ -39,7 +39,7 @@ class StopWatchActivity: AppCompatActivity() {
                 //update the ui with status
                 StopWatchService.STOPWATCH_STATUS -> {
                     val timeElapsed = intent.getIntExtra(StopWatchService.TIME_ELAPSED, 0)
-                    Log.d("StopWatchActivity", "Status received: timeElapsed")
+                    Log.d("StopWatchActivity", "Status received: $timeElapsed")
                     updateTimerDisplay(timeElapsed)
                 }
             }
