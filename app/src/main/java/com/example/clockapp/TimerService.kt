@@ -79,6 +79,9 @@ class TimerService: Service() {
         //Set the initial time
         val initialTime = intent?. getIntExtra(TIME_REMAINING, 0) ?: 0
 
+        if (initialTime > 0){
+            timeRemaining = initialTime
+        }
         when (action){
             //actions
             START -> startTimer(initialTime)
@@ -135,7 +138,7 @@ class TimerService: Service() {
 
         //Initialize the timeRemaining for a new start, otherwise use the current value
         // for timeRemaining
-        if(timeRemaining == 0) {
+        if(timeRemaining <= 0) {
             timeRemaining = initialTime
         }
 
@@ -245,7 +248,7 @@ class TimerService: Service() {
      * It checks if the timer is running, if it is then starts a foreground service with the notification
      */
     private fun moveToForeground(){
-        if(!isTimerRunning){return} //if false skip
+//        if(!isTimerRunning){return} //if false skip
 
         val notification = buildNotification()
         ServiceCompat.startForeground(
@@ -256,7 +259,10 @@ class TimerService: Service() {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             } else 0
         )
+        //Only start tick updates if timer is running
+        if (isTimerRunning) {
             startNotificationUpdates()
+        }
     }
     /**
      * When app comes to Background stop foreground service
