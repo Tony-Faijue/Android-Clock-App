@@ -30,7 +30,7 @@
         android:typeface="monospace" />
 
         <LinearLayout
-            android:id="@+id/stopwatch_btn_layout"
+            android:id="@+id/timer_btn_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -57,6 +57,12 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/show_dialog_timer_picker_btn"
+            android:layout_width="166dp"
+            android:layout_height="77dp"
+            android:text="ShowTimerPicker"
+            />
 
     </LinearLayout>
 

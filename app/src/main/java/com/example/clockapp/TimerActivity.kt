@@ -1,8 +1,10 @@
 package com.example.clockapp
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -32,6 +34,7 @@ class TimerActivity: AppCompatActivity() {
     //possible solution using number picker for user to select initial time
 
     private lateinit var timer: TextView
+    private lateinit var showTimerPickerDialogBtn: Button
     private lateinit var bottomNavBar : BottomNavigationView
 
     /**
@@ -61,10 +64,10 @@ class TimerActivity: AppCompatActivity() {
 
         //Request notification permission for Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                     1
                 )
             }
@@ -77,6 +80,37 @@ class TimerActivity: AppCompatActivity() {
 
         //Initialize the timer view
         timer = findViewById(R.id.timer_time)
+
+        //Initialize the show_timer_picker button
+        showTimerPickerDialogBtn = findViewById(R.id.show_dialog_timer_picker_btn)
+
+        //Initialize timer with default values
+        val defaultTime = "%02d:%02d:%02d".format(0, 0, 0)
+        timer.text = defaultTime
+
+        //Initialize buttons
+        //Initialize the onClick Listeners for the buttons
+        val startButton: Button = findViewById(R.id.start_btn)
+        val pauseButton: Button = findViewById(R.id.pause_btn)
+        val resetButton: Button = findViewById(R.id.reset_btn)
+
+        startButton.setOnClickListener { onClickStart(it) }
+        pauseButton.setOnClickListener { onClickPause(it) }
+        resetButton.setOnClickListener { onClickReset(it) }
+
+        //Set the onClick Listener for show dialog timer picker button
+        showTimerPickerDialogBtn.setOnClickListener {
+            val timePicker = TimePicker()
+            timePicker.setTitle("Select Time")
+            timePicker.setOnTimeSetOption("Set Time") {hour, minute, second ->
+                //Calculate total seconds
+                val totalSeconds = (hour * 3600) + (minute * 60) + second
+                //Format the time
+                val formatTime = "%02d:%02d:%02d".format(hour, minute, second)
+                timer.text = formatTime
+            }
+            timePicker.show(supportFragmentManager, "time_picker")
+        }
 
 
         bottomNavBar = findViewById(R.id.bottom_nav_1)
@@ -109,11 +143,25 @@ class TimerActivity: AppCompatActivity() {
     /**
      * Send a command to the Timer Service
      */
-    private fun sendCommandToService(action: String){
+    private fun sendCommandToService(action: String, timeInSeconds: Int = 0){
         try {
             val intent = Intent(this, TimerService::class.java)
             intent.putExtra(TimerService.TIMER_ACTION, action)
-            val result = startService(intent)
+
+            //Set the initial time
+            if (timeInSeconds > 0){
+                intent.putExtra(TimerService.TIME_REMAINING, timeInSeconds)
+            }
+
+            var result: Any?
+            //Modern Android version requires startForegroundService for FGS
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                result = startService(intent)
+                startForegroundService(intent)
+            } else {
+                result = startService(intent)
+            }
+
             if (result == null){
                 Log.e("TimerService", "startService returned Null")
             } else {
@@ -130,6 +178,8 @@ class TimerActivity: AppCompatActivity() {
     @Override
     override  fun onStart(){
         super.onStart()
+        registerReceiver()
+        sendCommandToService(TimerService.GET_STATUS)
         sendCommandToService(TimerService.MOVE_TO_BACKGROUND)
     }
 
@@ -156,16 +206,16 @@ class TimerActivity: AppCompatActivity() {
     }
 
     /**
-     * Register BroadcastReceiver to listen for service updates
+     * Register Receiver to listen for service updates
      */
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun registerReceiver(){
         val filter = IntentFilter().apply{
-            addAction(TimerService.TIMER_ACTION)
+            addAction(TimerService.TIMER_TICK)
             addAction(TimerService.TIMER_STATUS)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            registerReceiver(updateReceiver, filter, Context.RECEIVER_EXPORTED)
+            registerReceiver(updateReceiver, filter, RECEIVER_EXPORTED)
         } else {
             registerReceiver(updateReceiver, filter)
         }
@@ -173,7 +223,16 @@ class TimerActivity: AppCompatActivity() {
     //Start the running state for the timer
     private fun onClickStart(view: View){
         Log.d("TimerActivity", "Start button clicked")
-        sendCommandToService(TimerService.START)
+
+        //parse the current time from the textview
+        val timeText = timer.text.toString()
+        val parts = timeText.split(":")
+        val hours = parts[0].toInt()
+        val minutes = parts[1].toInt()
+        val seconds = parts[2].toInt()
+        val totalSeconds = (hours * 3600) + (minutes * 60) + seconds
+
+        sendCommandToService(TimerService.START, totalSeconds)
     }
     //Stop the running state for the timer
     private fun onClickPause(view: View){
@@ -193,7 +252,7 @@ class TimerActivity: AppCompatActivity() {
         val minutes: Int = (timeRemaining % 3600) / 60
         val secs : Int = timeRemaining % 60
         //Format the time
-        val time : String = String.format(Locale.getDefault(), "%02:%02:%02d", hours, minutes, secs)
+        val time : String = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, secs)
         timer.text = time
     }
 

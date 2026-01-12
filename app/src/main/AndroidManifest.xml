@@ -45,6 +45,15 @@
                 />
             </service>
 
+        <service android:name=".TimerService"
+            android:foregroundServiceType="specialUse"
+            android:enabled="true"
+            android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Timer running in background"/>
+        </service>
+
     </application>
 
 </manifest>
