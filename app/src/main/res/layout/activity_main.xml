@@ -49,6 +49,11 @@
             android:textSize="24sp"
             android:typeface="monospace" />
 
+        <Button
+            android:id="@+id/alarm_btn"
+            android:layout_width="128dp"
+            android:layout_height="78dp"
+            android:text="Start Alarm Activity" />
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
