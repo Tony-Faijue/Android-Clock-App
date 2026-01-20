@@ -58,6 +58,13 @@ class MainActivity : AppCompatActivity() {
 
         //Initialize UI Components
 
+        //------Temporary Alarm Button---------
+        val alarmBtn: Button = findViewById(R.id.alarm_btn)
+        alarmBtn.setOnClickListener{
+            val intent = Intent(this, AlarmActivity::class.java)
+            startActivity(intent)
+        }
+
         //Current Time 12-hour format
         clockTextView = findViewById(R.id.curr_time)
         //Run the 24 hour clock
